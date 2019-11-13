@@ -1,0 +1,7 @@
+steps:
+# Copying hive files to GSC
+- name: 'gcr.io/cloud-builders/gsutil'
+  args:
+  - 'cp'
+  - 'src/main/hive/*'
+  - 'gs://${PROJECT_ID}-artifacts/ch17-hive/${BRANCH_NAME}/hive/'

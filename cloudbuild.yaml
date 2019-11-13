@@ -1,7 +1,8 @@
 steps:
 
-- name: 'gcr.io/cloud-builders/git'
-  args: ['clone', 'https://github.com/GalchenkoAlexander/ch17-hive.git']
+# github clone
+#- name: 'gcr.io/cloud-builders/git'
+#  args: ['clone', 'https://github.com/GalchenkoAlexander/ch17-hive.git']
 
 # Copying hive files to GCS
 - name: 'gcr.io/cloud-builders/gsutil'
@@ -10,7 +11,25 @@ steps:
   - 'src/main/hive/*'
   - 'gs://${PROJECT_ID}-artifacts/ch17-hive/hive/'
 
+# Exec maven package
 - name: 'gcr.io/cloud-builders/mvn'
-  args: ['install']
-- name: 'gcr.io/cloud-builders/mvn'
-  args: ['package']
+  args: ['package', '-DoutputDirectory=target']
+  volumes:
+    - path: '/target'
+      name: 'target'
+
+# Copying jars files to GCS
+- name: 'gcr.io/cloud-builders/gsutil'
+  args:
+    - 'cp'
+    - '-r'
+    - 'target/*.jar'
+    - 'gs://${PROJECT_ID}-artifacts/ch17-hive/jars/'
+  volumes:
+    - path: '/target'
+      name: 'target'
+
+# deploy dataproc cluster
+#- name: 'gcr.io/cloud-builders/gcloud'
+#  args: ['dataproc', 'clusters', 'create']
+#  timeout: '1600s'
